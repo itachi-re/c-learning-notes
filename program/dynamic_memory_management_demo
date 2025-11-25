@@ -1,0 +1,395 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Dynamic array structure
+typedef struct {
+    int *data;
+    int size;
+    int capacity;
+} DynamicArray;
+
+// Function prototypes
+DynamicArray* createArray(int initialCapacity);
+void push(DynamicArray *arr, int value);
+int pop(DynamicArray *arr);
+void insert(DynamicArray *arr, int index, int value);
+void removeAt(DynamicArray *arr, int index);
+void printArray(DynamicArray *arr);
+void freeArray(DynamicArray *arr);
+void resize(DynamicArray *arr, int newCapacity);
+
+// Dynamic string operations
+char* createString(const char *str);
+char* concatStrings(const char *str1, const char *str2);
+char* substring(const char *str, int start, int length);
+
+// Memory allocation demos
+void mallocDemo();
+void callocDemo();
+void reallocDemo();
+void memoryLeakDemo();
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n=== Dynamic Memory Management ===\n");
+        printf("1. Dynamic Array Operations\n");
+        printf("2. malloc() demonstration\n");
+        printf("3. calloc() demonstration\n");
+        printf("4. realloc() demonstration\n");
+        printf("5. Memory leak example\n");
+        printf("6. Dynamic string operations\n");
+        printf("7. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: {
+                DynamicArray *arr = createArray(2);
+                int option, value, index;
+
+                while (1) {
+                    printf("\n--- Dynamic Array Menu ---\n");
+                    printf("1. Push element\n");
+                    printf("2. Pop element\n");
+                    printf("3. Insert at index\n");
+                    printf("4. Remove at index\n");
+                    printf("5. Display array\n");
+                    printf("6. Back to main menu\n");
+                    printf("Enter option: ");
+                    scanf("%d", &option);
+
+                    if (option == 6) {
+                        freeArray(arr);
+                        break;
+                    }
+
+                    switch (option) {
+                        case 1:
+                            printf("Enter value: ");
+                            scanf("%d", &value);
+                            push(arr, value);
+                            break;
+                        case 2:
+                            value = pop(arr);
+                            if (value != -1)
+                                printf("Popped: %d\n", value);
+                            break;
+                        case 3:
+                            printf("Enter index: ");
+                            scanf("%d", &index);
+                            printf("Enter value: ");
+                            scanf("%d", &value);
+                            insert(arr, index, value);
+                            break;
+                        case 4:
+                            printf("Enter index: ");
+                            scanf("%d", &index);
+                            removeAt(arr, index);
+                            break;
+                        case 5:
+                            printArray(arr);
+                            break;
+                        default:
+                            printf("Invalid option!\n");
+                    }
+                }
+                break;
+            }
+
+            case 2:
+                mallocDemo();
+                break;
+
+            case 3:
+                callocDemo();
+                break;
+
+            case 4:
+                reallocDemo();
+                break;
+
+            case 5:
+                memoryLeakDemo();
+                break;
+
+            case 6: {
+                char str1[100], str2[100];
+                getchar(); // Clear buffer
+
+                printf("Enter first string: ");
+                fgets(str1, 100, stdin);
+                str1[strcspn(str1, "\n")] = 0;
+
+                printf("Enter second string: ");
+                fgets(str2, 100, stdin);
+                str2[strcspn(str2, "\n")] = 0;
+
+                char *concat = concatStrings(str1, str2);
+                printf("Concatenated: %s\n", concat);
+                free(concat);
+
+                char *sub = substring(str1, 0, 5);
+                printf("Substring (0-5): %s\n", sub);
+                free(sub);
+                break;
+            }
+
+            case 7:
+                printf("Goodbye!\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
+}
+
+DynamicArray* createArray(int initialCapacity) {
+    DynamicArray *arr = (DynamicArray*)malloc(sizeof(DynamicArray));
+    if (arr == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+
+    arr->data = (int*)malloc(initialCapacity * sizeof(int));
+    if (arr->data == NULL) {
+        printf("Memory allocation failed!\n");
+        free(arr);
+        exit(1);
+    }
+
+    arr->size = 0;
+    arr->capacity = initialCapacity;
+    printf("Array created with capacity %d\n", initialCapacity);
+    return arr;
+}
+
+void resize(DynamicArray *arr, int newCapacity) {
+    int *newData = (int*)realloc(arr->data, newCapacity * sizeof(int));
+    if (newData == NULL) {
+        printf("Memory reallocation failed!\n");
+        return;
+    }
+
+    arr->data = newData;
+    arr->capacity = newCapacity;
+    printf("Array resized to capacity %d\n", newCapacity);
+}
+
+void push(DynamicArray *arr, int value) {
+    if (arr->size >= arr->capacity) {
+        resize(arr, arr->capacity * 2);
+    }
+    arr->data[arr->size++] = value;
+    printf("Pushed %d (size: %d, capacity: %d)\n", value, arr->size, arr->capacity);
+}
+
+int pop(DynamicArray *arr) {
+    if (arr->size == 0) {
+        printf("Array is empty!\n");
+        return -1;
+    }
+    return arr->data[--arr->size];
+}
+
+void insert(DynamicArray *arr, int index, int value) {
+    if (index < 0 || index > arr->size) {
+        printf("Invalid index!\n");
+        return;
+    }
+
+    if (arr->size >= arr->capacity) {
+        resize(arr, arr->capacity * 2);
+    }
+
+    for (int i = arr->size; i > index; i--) {
+        arr->data[i] = arr->data[i - 1];
+    }
+
+    arr->data[index] = value;
+    arr->size++;
+    printf("Inserted %d at index %d\n", value, index);
+}
+
+void removeAt(DynamicArray *arr, int index) {
+    if (index < 0 || index >= arr->size) {
+        printf("Invalid index!\n");
+        return;
+    }
+
+    for (int i = index; i < arr->size - 1; i++) {
+        arr->data[i] = arr->data[i + 1];
+    }
+
+    arr->size--;
+    printf("Removed element at index %d\n", index);
+}
+
+void printArray(DynamicArray *arr) {
+    printf("Array [size: %d, capacity: %d]: ", arr->size, arr->capacity);
+    for (int i = 0; i < arr->size; i++) {
+        printf("%d ", arr->data[i]);
+    }
+    printf("\n");
+}
+
+void freeArray(DynamicArray *arr) {
+    free(arr->data);
+    free(arr);
+    printf("Array memory freed\n");
+}
+
+void mallocDemo() {
+    printf("\n=== malloc() Demo ===\n");
+
+    int *ptr = (int*)malloc(5 * sizeof(int));
+    if (ptr == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    printf("Memory allocated for 5 integers\n");
+    printf("Initial values (garbage): ");
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", ptr[i]);
+    }
+
+    printf("\nSetting values...\n");
+    for (int i = 0; i < 5; i++) {
+        ptr[i] = i * 10;
+    }
+
+    printf("After initialization: ");
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", ptr[i]);
+    }
+    printf("\n");
+
+    free(ptr);
+    printf("Memory freed\n");
+}
+
+void callocDemo() {
+    printf("\n=== calloc() Demo ===\n");
+
+    int *ptr = (int*)calloc(5, sizeof(int));
+    if (ptr == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    printf("Memory allocated and initialized to 0\n");
+    printf("Initial values: ");
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", ptr[i]);
+    }
+    printf("\n");
+
+    free(ptr);
+    printf("Memory freed\n");
+}
+
+void reallocDemo() {
+    printf("\n=== realloc() Demo ===\n");
+
+    int *ptr = (int*)malloc(3 * sizeof(int));
+    if (ptr == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    for (int i = 0; i < 3; i++) {
+        ptr[i] = i + 1;
+    }
+
+    printf("Initial array: ");
+    for (int i = 0; i < 3; i++) {
+        printf("%d ", ptr[i]);
+    }
+    printf("\n");
+
+    ptr = (int*)realloc(ptr, 6 * sizeof(int));
+    if (ptr == NULL) {
+        printf("Memory reallocation failed!\n");
+        return;
+    }
+
+    for (int i = 3; i < 6; i++) {
+        ptr[i] = i + 1;
+    }
+
+    printf("After realloc: ");
+    for (int i = 0; i < 6; i++) {
+        printf("%d ", ptr[i]);
+    }
+    printf("\n");
+
+    free(ptr);
+    printf("Memory freed\n");
+}
+
+void memoryLeakDemo() {
+    printf("\n=== Memory Leak Example ===\n");
+    printf("This demonstrates a memory leak (educational purpose)\n");
+
+    // Memory leak - allocated but never freed
+    int *leaked = (int*)malloc(100 * sizeof(int));
+    printf("Allocated 100 integers but not freeing them\n");
+    printf("In a real program, you should always free() allocated memory!\n");
+    printf("Use tools like valgrind to detect memory leaks\n");
+
+    // Correct way:
+    int *proper = (int*)malloc(100 * sizeof(int));
+    // ... use the memory ...
+    free(proper);
+    printf("Proper allocation and deallocation demonstrated\n");
+}
+
+char* createString(const char *str) {
+    char *newStr = (char*)malloc((strlen(str) + 1) * sizeof(char));
+    if (newStr == NULL) {
+        return NULL;
+    }
+    strcpy(newStr, str);
+    return newStr;
+}
+
+char* concatStrings(const char *str1, const char *str2) {
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+
+    char *result = (char*)malloc((len1 + len2 + 1) * sizeof(char));
+    if (result == NULL) {
+        return NULL;
+    }
+
+    strcpy(result, str1);
+    strcat(result, str2);
+    return result;
+}
+
+char* substring(const char *str, int start, int length) {
+    int strLen = strlen(str);
+
+    if (start < 0 || start >= strLen) {
+        return NULL;
+    }
+
+    if (start + length > strLen) {
+        length = strLen - start;
+    }
+
+    char *sub = (char*)malloc((length + 1) * sizeof(char));
+    if (sub == NULL) {
+        return NULL;
+    }
+
+    strncpy(sub, str + start, length);
+    sub[length] = '\0';
+    return sub;
+}
