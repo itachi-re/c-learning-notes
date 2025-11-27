@@ -1,0 +1,347 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define BUFFER_SIZE 1024
+
+void createFile();
+void readFile();
+void appendToFile();
+void copyFile();
+void countFileStats();
+void searchInFile();
+void replaceInFile();
+void encryptFile();
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n=== File Operations Utility ===\n");
+        printf("1. Create/Write to file\n");
+        printf("2. Read file\n");
+        printf("3. Append to file\n");
+        printf("4. Copy file\n");
+        printf("5. File statistics (lines, words, chars)\n");
+        printf("6. Search in file\n");
+        printf("7. Replace text in file\n");
+        printf("8. Simple encrypt/decrypt file\n");
+        printf("9. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        getchar(); // Clear buffer
+
+        switch (choice) {
+            case 1:
+                createFile();
+                break;
+            case 2:
+                readFile();
+                break;
+            case 3:
+                appendToFile();
+                break;
+            case 4:
+                copyFile();
+                break;
+            case 5:
+                countFileStats();
+                break;
+            case 6:
+                searchInFile();
+                break;
+            case 7:
+                replaceInFile();
+                break;
+            case 8:
+                encryptFile();
+                break;
+            case 9:
+                printf("Goodbye!\n");
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
+}
+
+void createFile() {
+    char filename[100], line[BUFFER_SIZE];
+    FILE *fp;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    fp = fopen(filename, "w");
+    if (fp == NULL) {
+        printf("Error creating file!\n");
+        return;
+    }
+
+    printf("Enter text (type 'END' on a new line to finish):\n");
+    while (1) {
+        fgets(line, BUFFER_SIZE, stdin);
+        if (strcmp(line, "END\n") == 0) {
+            break;
+        }
+        fputs(line, fp);
+    }
+
+    fclose(fp);
+    printf("File created successfully!\n");
+}
+
+void readFile() {
+    char filename[100], ch;
+    FILE *fp;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("\n--- File Contents ---\n");
+    while ((ch = fgetc(fp)) != EOF) {
+        putchar(ch);
+    }
+    printf("\n--- End of File ---\n");
+
+    fclose(fp);
+}
+
+void appendToFile() {
+    char filename[100], line[BUFFER_SIZE];
+    FILE *fp;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    fp = fopen(filename, "a");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("Enter text to append (type 'END' on a new line to finish):\n");
+    while (1) {
+        fgets(line, BUFFER_SIZE, stdin);
+        if (strcmp(line, "END\n") == 0) {
+            break;
+        }
+        fputs(line, fp);
+    }
+
+    fclose(fp);
+    printf("Text appended successfully!\n");
+}
+
+void copyFile() {
+    char source[100], dest[100], ch;
+    FILE *fps, *fpd;
+
+    printf("Enter source filename: ");
+    fgets(source, 100, stdin);
+    source[strcspn(source, "\n")] = 0;
+
+    printf("Enter destination filename: ");
+    fgets(dest, 100, stdin);
+    dest[strcspn(dest, "\n")] = 0;
+
+    fps = fopen(source, "r");
+    if (fps == NULL) {
+        printf("Error opening source file!\n");
+        return;
+    }
+
+    fpd = fopen(dest, "w");
+    if (fpd == NULL) {
+        printf("Error creating destination file!\n");
+        fclose(fps);
+        return;
+    }
+
+    while ((ch = fgetc(fps)) != EOF) {
+        fputc(ch, fpd);
+    }
+
+    fclose(fps);
+    fclose(fpd);
+    printf("File copied successfully!\n");
+}
+
+void countFileStats() {
+    char filename[100], ch;
+    FILE *fp;
+    int lines = 0, words = 0, chars = 0;
+    int inWord = 0;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    while ((ch = fgetc(fp)) != EOF) {
+        chars++;
+
+        if (ch == '\n') {
+            lines++;
+        }
+
+        if (isspace(ch)) {
+            inWord = 0;
+        } else if (!inWord) {
+            inWord = 1;
+            words++;
+        }
+    }
+
+    fclose(fp);
+
+    printf("\n--- File Statistics ---\n");
+    printf("Lines: %d\n", lines);
+    printf("Words: %d\n", words);
+    printf("Characters: %d\n", chars);
+}
+
+void searchInFile() {
+    char filename[100], search[100], line[BUFFER_SIZE];
+    FILE *fp;
+    int lineNum = 0, found = 0;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    printf("Enter text to search: ");
+    fgets(search, 100, stdin);
+    search[strcspn(search, "\n")] = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("\n--- Search Results ---\n");
+    while (fgets(line, BUFFER_SIZE, fp)) {
+        lineNum++;
+        if (strstr(line, search) != NULL) {
+            printf("Line %d: %s", lineNum, line);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("Text not found!\n");
+    }
+
+    fclose(fp);
+}
+
+void replaceInFile() {
+    char filename[100], search[100], replace[100];
+    char line[BUFFER_SIZE], newLine[BUFFER_SIZE];
+    FILE *fp, *temp;
+
+    printf("Enter filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    printf("Enter text to search: ");
+    fgets(search, 100, stdin);
+    search[strcspn(search, "\n")] = 0;
+
+    printf("Enter replacement text: ");
+    fgets(replace, 100, stdin);
+    replace[strcspn(replace, "\n")] = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    temp = fopen("temp.txt", "w");
+    if (temp == NULL) {
+        printf("Error creating temp file!\n");
+        fclose(fp);
+        return;
+    }
+
+    while (fgets(line, BUFFER_SIZE, fp)) {
+        char *pos = strstr(line, search);
+        if (pos != NULL) {
+            strncpy(newLine, line, pos - line);
+            newLine[pos - line] = '\0';
+            strcat(newLine, replace);
+            strcat(newLine, pos + strlen(search));
+            fputs(newLine, temp);
+        } else {
+            fputs(line, temp);
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove(filename);
+    rename("temp.txt", filename);
+    printf("Text replaced successfully!\n");
+}
+
+void encryptFile() {
+    char filename[100], outfile[100], ch;
+    FILE *fp, *out;
+    int key = 3; // Simple Caesar cipher key
+
+    printf("Enter input filename: ");
+    fgets(filename, 100, stdin);
+    filename[strcspn(filename, "\n")] = 0;
+
+    printf("Enter output filename: ");
+    fgets(outfile, 100, stdin);
+    outfile[strcspn(outfile, "\n")] = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    out = fopen(outfile, "w");
+    if (out == NULL) {
+        printf("Error creating output file!\n");
+        fclose(fp);
+        return;
+    }
+
+    while ((ch = fgetc(fp)) != EOF) {
+        if (isalpha(ch)) {
+            if (isupper(ch)) {
+                ch = ((ch - 'A' + key) % 26) + 'A';
+            } else {
+                ch = ((ch - 'a' + key) % 26) + 'a';
+            }
+        }
+        fputc(ch, out);
+    }
+
+    fclose(fp);
+    fclose(out);
+    printf("File encrypted successfully! (Caesar cipher with key=3)\n");
+}

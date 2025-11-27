@@ -1,0 +1,283 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+#define MAX_SIZE 1000
+
+// Function prototypes
+void bubbleSort(int arr[], int n);
+void selectionSort(int arr[], int n);
+void insertionSort(int arr[], int n);
+void mergeSort(int arr[], int left, int right);
+void quickSort(int arr[], int low, int high);
+void printArray(int arr[], int n, int limit);
+void generateRandomArray(int arr[], int n);
+void copyArray(int src[], int dest[], int n);
+double measureTime(void (*sortFunc)(int[], int), int arr[], int n);
+
+// Helper functions for merge sort
+void merge(int arr[], int left, int mid, int right);
+
+// Helper functions for quick sort
+int partition(int arr[], int low, int high);
+
+int main() {
+    int choice, n;
+    int arr[MAX_SIZE], temp[MAX_SIZE];
+
+    printf("Enter array size (max %d): ", MAX_SIZE);
+    scanf("%d", &n);
+
+    if (n <= 0 || n > MAX_SIZE) {
+        printf("Invalid size!\n");
+        return 1;
+    }
+
+    while (1) {
+        printf("\n=== Sorting Algorithms ===\n");
+        printf("1. Generate random array\n");
+        printf("2. Bubble Sort\n");
+        printf("3. Selection Sort\n");
+        printf("4. Insertion Sort\n");
+        printf("5. Merge Sort\n");
+        printf("6. Quick Sort\n");
+        printf("7. Compare all algorithms\n");
+        printf("8. Display current array\n");
+        printf("9. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                generateRandomArray(arr, n);
+                printf("Random array generated!\n");
+                break;
+
+            case 2:
+                copyArray(arr, temp, n);
+                bubbleSort(temp, n);
+                printf("Sorted with Bubble Sort:\n");
+                printArray(temp, n, 20);
+                break;
+
+            case 3:
+                copyArray(arr, temp, n);
+                selectionSort(temp, n);
+                printf("Sorted with Selection Sort:\n");
+                printArray(temp, n, 20);
+                break;
+
+            case 4:
+                copyArray(arr, temp, n);
+                insertionSort(temp, n);
+                printf("Sorted with Insertion Sort:\n");
+                printArray(temp, n, 20);
+                break;
+
+            case 5:
+                copyArray(arr, temp, n);
+                mergeSort(temp, 0, n - 1);
+                printf("Sorted with Merge Sort:\n");
+                printArray(temp, n, 20);
+                break;
+
+            case 6:
+                copyArray(arr, temp, n);
+                quickSort(temp, 0, n - 1);
+                printf("Sorted with Quick Sort:\n");
+                printArray(temp, n, 20);
+                break;
+
+            case 7: {
+                printf("\n=== Performance Comparison ===\n");
+                printf("Array size: %d\n\n", n);
+
+                copyArray(arr, temp, n);
+                double time = measureTime(bubbleSort, temp, n);
+                printf("Bubble Sort: %.6f seconds\n", time);
+
+                copyArray(arr, temp, n);
+                time = measureTime(selectionSort, temp, n);
+                printf("Selection Sort: %.6f seconds\n", time);
+
+                copyArray(arr, temp, n);
+                time = measureTime(insertionSort, temp, n);
+                printf("Insertion Sort: %.6f seconds\n", time);
+
+                copyArray(arr, temp, n);
+                clock_t start = clock();
+                mergeSort(temp, 0, n - 1);
+                clock_t end = clock();
+                printf("Merge Sort: %.6f seconds\n",
+                       (double)(end - start) / CLOCKS_PER_SEC);
+
+                copyArray(arr, temp, n);
+                start = clock();
+                quickSort(temp, 0, n - 1);
+                end = clock();
+                printf("Quick Sort: %.6f seconds\n",
+                       (double)(end - start) / CLOCKS_PER_SEC);
+                break;
+            }
+
+            case 8:
+                printf("Current array:\n");
+                printArray(arr, n, 50);
+                break;
+
+            case 9:
+                printf("Goodbye!\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
+}
+
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+        int temp = arr[minIdx];
+        arr[minIdx] = arr[i];
+        arr[i] = temp;
+    }
+}
+
+void insertionSort(int arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+void merge(int arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    int *L = (int*)malloc(n1 * sizeof(int));
+    int *R = (int*)malloc(n2 * sizeof(int));
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+
+    free(L);
+    free(R);
+}
+
+void mergeSort(int arr[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+
+    int temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+
+    return i + 1;
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printArray(int arr[], int n, int limit) {
+    int count = (n < limit) ? n : limit;
+    for (int i = 0; i < count; i++) {
+        printf("%d ", arr[i]);
+    }
+    if (n > limit) {
+        printf("... (%d more elements)", n - limit);
+    }
+    printf("\n");
+}
+
+void generateRandomArray(int arr[], int n) {
+    srand(time(NULL));
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % 1000;
+    }
+}
+
+void copyArray(int src[], int dest[], int n) {
+    memcpy(dest, src, n * sizeof(int));
+}
+
+double measureTime(void (*sortFunc)(int[], int), int arr[], int n) {
+    clock_t start = clock();
+    sortFunc(arr, n);
+    clock_t end = clock();
+    return (double)(end - start) / CLOCKS_PER_SEC;
+}

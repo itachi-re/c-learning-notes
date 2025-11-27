@@ -1,9 +1,15 @@
 # ${TITLE}
 
-## Overview
-...
+*Date: $(date +"%Y-%m-%d")*
 
-## Example
+---
+
+## Summary
+
+## Key Concepts
+
+-
+
+## Code Examples
+
 ```c
-// code sample here
-
