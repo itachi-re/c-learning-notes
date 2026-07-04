@@ -1,0 +1,83 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.c"
+      - "**/*.h"
+      - "Makefile"
+      - "CMakeLists.txt"
+      - ".github/workflows/build-and-test.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.c"
+      - "**/*.h"
+      - "Makefile"
+      - "CMakeLists.txt"
+      - ".github/workflows/build-and-test.yml"
+  workflow_dispatch:
+
+jobs:
+  compile-examples:
+    name: Compile (${{ matrix.compiler }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.compiler }} clang-tools
+
+      - name: Compile every standalone example with strict flags
+        env:
+          CC: ${{ matrix.compiler }}
+        run: |
+          set -e
+          fail=0
+          # Only compiles files intended to build standalone (main() present).
+          # Files meant to be #included as teaching fragments should live
+          # under a "snippets/" subfolder and are skipped here.
+          find notes examples projects -type f -name "*.c" \
+            -not -path "*/snippets/*" | while read -r file; do
+            out="/tmp/$(basename "${file%.c}").out"
+            echo "::group::Compiling $file"
+            if ! "$CC" -std=c11 -Wall -Wextra -Wpedantic \
+                 -fsanitize=address,undefined -g -O0 \
+                 -o "$out" "$file" 2> /tmp/err.log; then
+              echo "FAILED: $file"
+              cat /tmp/err.log
+              fail=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $fail
+
+  run-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    needs: compile-examples
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc make
+
+      - name: Run test suite
+        run: |
+          if [ -f Makefile ]; then
+            make test
+          else
+            echo "No top-level Makefile with a 'test' target found; skipping."
+          fi
