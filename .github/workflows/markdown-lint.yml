@@ -1,0 +1,32 @@
+name: Markdown Lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - ".markdownlint.json"
+      - ".github/workflows/markdown-lint.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - ".markdownlint.json"
+      - ".github/workflows/markdown-lint.yml"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: markdownlint-cli2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run markdownlint-cli2
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**
+          config: .markdownlint.json
