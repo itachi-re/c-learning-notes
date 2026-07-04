@@ -1,0 +1,75 @@
+name: 📚 Content Request
+description: Propose a new chapter, example program, exercise, project, or cheatsheet.
+title: "[Content]: "
+labels: ["content-request", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for something this repo is missing? Check the [Roadmap](../../docs/ROADMAP.md)
+        first — it might already be planned.
+
+  - type: dropdown
+    id: content-type
+    attributes:
+      label: What kind of content is this?
+      options:
+        - New chapter (notes/)
+        - New example program (examples/)
+        - New exercise (exercises/)
+        - New project (projects/)
+        - New cheatsheet (cheatsheets/)
+        - Diagram or visual (diagrams/)
+        - Improvement to existing content (not a new addition)
+    validations:
+      required: true
+
+  - type: input
+    id: target-location
+    attributes:
+      label: Where should this live?
+      description: Suggested path or chapter number, if you have one in mind.
+      placeholder: notes/23_concurrency_and_threads/ or examples/advanced/lockfree_queue.c
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should this cover?
+      description: Describe the concept, why it matters, and what a learner should walk away understanding.
+      placeholder: |
+        A chapter on lock-free data structures using C11 atomics, covering the ABA
+        problem, memory ordering, and a worked lock-free queue example.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Suggested difficulty level
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+        - Expert / Systems
+    validations:
+      required: false
+
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Prerequisite chapters or concepts
+      description: What should a learner already know before this?
+      placeholder: Pointers (09), Dynamic Memory (16), POSIX (22)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd be willing to submit a PR for this myself.
+          required: false
