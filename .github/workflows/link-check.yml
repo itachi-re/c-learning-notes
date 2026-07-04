@@ -1,0 +1,38 @@
+name: Link Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.md"
+  schedule:
+    # Catch links that rotted after merge, not just at PR time.
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    name: lychee
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --verbose
+            --no-progress
+            --exclude-mail
+            --accept 100..=103,200..=299,403
+            --timeout 20
+            --max-retries 2
+            './**/*.md'
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
