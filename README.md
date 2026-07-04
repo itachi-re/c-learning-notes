@@ -4,7 +4,7 @@ A comprehensive collection of notes, code snippets, and hands-on projects docume
 
 [![Language](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
+[![Spell Check](https://github.com/itachi-re/c-learning-notes/actions/workflows/spellcheck.yml/badge.svg)](https://github.com/itachi-re/c-learning-notes/actions/workflows/spellcheck.yml)
 ---
 
 ## 📚 Overview
