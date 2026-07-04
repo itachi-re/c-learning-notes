@@ -1,0 +1,45 @@
+name: ❓ Question
+description: Ask about a concept, an example, or how to use this repository.
+title: "[Question]: "
+labels: ["question"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For open-ended discussion (not a specific bug), consider using
+        [Discussions](../../discussions) instead — it's a better fit for back-and-forth.
+        Use this form for a focused question tied to a specific chapter or file.
+
+  - type: input
+    id: related-content
+    attributes:
+      label: Related chapter or file
+      description: Which part of the repo is this about?
+      placeholder: notes/10_memory_layout/README.md
+    validations:
+      required: false
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Be as specific as possible — "I don't get pointers" is hard to answer; "why does this cast change the output on line 14" is easy.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-tried
+    attributes:
+      label: What have you already tried or read?
+      description: Helps avoid pointing you back to something you've already seen.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked the chapter's README, FAQ, and Glossary first.
+          required: true
