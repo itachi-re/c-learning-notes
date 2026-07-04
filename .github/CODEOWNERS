@@ -1,0 +1,31 @@
+# CODEOWNERS
+#
+# Replace @OWNER (and any additional usernames) with real GitHub handles.
+# Order matters: later, more specific rules override earlier, broader ones.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything not matched below
+*                               @OWNER
+
+# Core documentation and repo-wide standards
+/README.md                     @OWNER
+/CONTRIBUTING.md                @OWNER
+/docs/                          @OWNER
+/docs/STYLE_GUIDE.md            @OWNER
+
+# CI / tooling / repo configuration
+/.github/                       @OWNER
+/.clang-format                  @OWNER
+/.markdownlint.json              @OWNER
+/.cspell.json                    @OWNER
+/Makefile                        @OWNER
+/CMakeLists.txt                  @OWNER
+
+# Content areas (split these out to other maintainers as the project grows)
+/notes/                          @OWNER
+/examples/                       @OWNER
+/exercises/                      @OWNER
+/solutions/                      @OWNER
+/projects/                       @OWNER
+/benchmarks/                     @OWNER
+/cheatsheets/                    @OWNER
