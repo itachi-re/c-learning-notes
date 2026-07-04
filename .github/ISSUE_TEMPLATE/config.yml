@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 General Discussion
+    url: https://github.com/OWNER/c-learning-notes/discussions
+    about: Open-ended questions, ideas, and community discussion that isn't a specific bug or content request.
+  - name: 📖 Read the FAQ
+    url: https://github.com/OWNER/c-learning-notes/blob/main/docs/FAQ.md
+    about: Common questions about toolchain setup, running examples, and repo structure are answered here.
