@@ -1,0 +1,39 @@
+name: Spell Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - "**/*.c"
+      - "**/*.h"
+      - ".cspell.json"
+      - ".github/workflows/spellcheck.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - "**/*.c"
+      - "**/*.h"
+      - ".cspell.json"
+      - ".github/workflows/spellcheck.yml"
+  workflow_dispatch:
+
+jobs:
+  spellcheck:
+    name: cspell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install cspell
+        run: npm install -g cspell@latest
+
+      - name: Run spell check
+        run: cspell --config .cspell.json "**/*.md" "**/*.c" "**/*.h" --no-progress
