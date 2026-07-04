@@ -1,0 +1,79 @@
+name: 🐛 Bug Report
+description: Report incorrect code, a compile error, undefined behavior, or a factual mistake in the notes.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Please search [existing issues](../../issues) first to avoid duplicates.
+
+  - type: input
+    id: location
+    attributes:
+      label: File or chapter affected
+      description: Path to the file, e.g. `notes/09_pointers/examples/swap.c` or `examples/intermediate/linked_list.c`
+      placeholder: notes/09_pointers/examples/swap.c
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Type of issue
+      options:
+        - Compile error / warning
+        - Incorrect output at runtime
+        - Undefined behavior (UB) not flagged by ASan/UBSan
+        - Memory leak / invalid free
+        - Factual or conceptual error in the note text
+        - Typo or formatting issue
+        - Broken link
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What's wrong, and what did you expect instead?
+      placeholder: |
+        The code claims X, but compiling with -fsanitize=undefined reports Y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact compile command and, if relevant, input used.
+      placeholder: |
+        gcc -Wall -Wextra -fsanitize=address,undefined -o swap swap.c
+        ./swap
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Compiler, version, OS. Run `gcc --version` or `clang --version` and `uname -a`.
+      placeholder: |
+        gcc (Ubuntu 13.2.0) 13.2.0
+        Linux 6.8.0
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this hasn't been reported before.
+          required: true
+        - label: I tested with `-Wall -Wextra` (and ASan/UBSan where applicable) before reporting.
+          required: false
